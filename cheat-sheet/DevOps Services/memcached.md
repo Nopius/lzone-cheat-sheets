@@ -16,6 +16,10 @@ started and use the same with telnet to connect to memcache. Example:
 
     telnet 10.0.0.2 11211
 
+For scripted processing you may want to use 'netcat' or 'nc' command. Example:
+
+    ... <script to generate commands> ... | nc 10.0.0.2 11211 | ... <script to process output> ...
+
 ### Supported Commands
 
 The supported commands (the official ones and some unofficial) are
@@ -462,6 +466,16 @@ creation. Given the key name you can now also dump its value using
 
 This is it: iterate over all slabs classes you want, extract the key
 names and if need dump there contents.
+
+#### Dumping Memcache Keys (ver 1.4.31+)
+In memcache version 1.4.31 and above there is a new command implemented for dumping memory keys in non-blocking mode ( https://github.com/memcached/memcached/wiki/ReleaseNotes1431). Since the method is non-blocking, it is safe enough to run in prodiction. The output is not consistent, but good enough for finding keys, their exact expiration time (EXP) and last accessed time (LA). Because of huge output generated, it's recommended to use 'nc' command: 
+
+    echo 'lru_crawler metadump all' | nc 127.0.0.1 11211 | head -1
+    key=0dLLX%253Amemcache_test_key exp=1590718787 la=1590718487 cas=2238881166 fetch=yes
+    
+    echo 'lru_crawler metadump all' | nc 127.0.0.1 11211 | grep ee6ba58566e234ccbbce13f9a24f9a28
+    key=VQRFX%253Aee6ba58566e234ccbbce13f9a24f9a28 exp=-1 la=1590386157 cas=1776204003 fetch=yes
+    key=0dLLX%253Aee6ba58566e234ccbbce13f9a24f9a28 exp=-1 la=1590712292 cas=2225524871 fetch=yes
 
 #### Dumping Tools
 
